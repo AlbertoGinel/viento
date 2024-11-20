@@ -1,0 +1,63 @@
+{
+  "rules": {
+    "version": "2",
+    "service": {
+      "firebase": {
+        "rules": {
+          "firestore": {
+            "rules": {
+              "read": "auth != null",
+              "write": "auth != null"
+            }
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "indexes": [
+    {
+      "collectionId": "users",
+      "fields": [
+        {
+          "fieldPath": "lastName",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "firstName",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "database": {
+    "rules": {
+      "version": "2",
+      "service": {
+        "firebase": {
+          "rules": {
+            "firestore": {
+              "rules": {
+                "read": "auth != null",
+                "write": "auth != null"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "hosting": {
+    "public": "dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
