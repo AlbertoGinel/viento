@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, TextInput, Button, Text, StyleSheet, Alert } from "react-native";
 import { useAuthStore } from "../store/useAuthStore";
 import { useRouter } from "expo-router"; // For navigation
+import { TouchableOpacity } from "react-native";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -44,9 +45,9 @@ const Login: React.FC = () => {
         onChangeText={setPassword}
         secureTextEntry={true}
       />
-
-      {/* Login Button */}
-      <Button title="Login" onPress={handleLogin} />
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>LOGIN</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -71,6 +72,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingLeft: 10,
     marginBottom: 20,
+  },
+  button: {
+    backgroundColor: "#2e6ef7", // Button background color
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    borderRadius: 25,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 3, // For Android shadow
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 
