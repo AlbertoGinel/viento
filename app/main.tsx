@@ -1,35 +1,75 @@
-import React, { useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, Text } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location"; // For getting user location
 import { useAuthStore } from "../store/useAuthStore"; // Zustand store for authentication
-import { useRouter } from "expo-router";
+import { useRouter } from "expo-router"; // For navigation
 
 const Main: React.FC = () => {
-  const { isAuthenticated, userData } = useAuthStore((state) => state); // Zustand state
-  const router = useRouter();
+  const { isAuthenticated } = useAuthStore((state) => state); // Get auth state from Zustand store
+  const router = useRouter(); // Use the router to navigate
+  const [userLocation, setUserLocation] = useState(null); // Store user's location
+  const [isReady, setIsReady] = useState(false); // To track when the component is mounted
 
-  // Redirect to /login if not authenticated
+  // Wait for the component to be ready (mounted) before attempting navigation
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace("/login"); // Replace the current route with /login
-    }
-  }, [isAuthenticated, router]);
+    setIsReady(true); // Mark the component as ready after it's mounted
+  }, []);
 
-  // Show nothing if not authenticated (redirecting)
-  if (!isAuthenticated) {
+  // If the user is not authenticated and the component is mounted, redirect to login
+  useEffect(() => {
+    if (isReady && !isAuthenticated) {
+      router.replace("/login"); // Redirect to login page if not authenticated
+    }
+  }, [isAuthenticated, isReady, router]);
+
+  // Request user location
+  useEffect(() => {
+    const getLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setUserLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    };
+
+    getLocation();
+  }, []);
+
+  if (!isAuthenticated || !userLocation) {
+    // Optionally, you can return a loading state until location or authentication is ready
     return (
       <View style={styles.container}>
-        <Text>Redirecting...</Text>
+        <Text>Loading...</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      {/* Display the displayName from Firestore userData */}
-      <Text style={styles.greeting}>
-        Hello, {userData?.displayName || "User"}!
-      </Text>
-      <Text style={styles.title}>Main Page</Text>
+      <MapView
+        style={StyleSheet.absoluteFillObject} // Fill the entire screen
+        initialRegion={{
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          latitudeDelta: 0.005, // Close zoom level for user's location
+          longitudeDelta: 0.005, // Close zoom level for user's location
+        }}
+        showsUserLocation={true} // Show the user's location as a blue dot
+      >
+        {/* Marker at the user's location */}
+        <Marker
+          coordinate={userLocation}
+          title="You are here"
+          description="This is your current location"
+        />
+      </MapView>
     </View>
   );
 };
@@ -37,21 +77,6 @@ const Main: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f8f9fa", // Light background color for better readability
-  },
-  greeting: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#555", // Medium text color
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333", // Dark text color
   },
 });
 

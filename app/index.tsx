@@ -1,14 +1,32 @@
-import { Link } from "expo-router";
-import { Text, View, Button } from "react-native";
+import React from "react";
+import { View, Text, Button, StyleSheet } from "react-native";
+import { useRouter } from "expo-router"; // For navigation
 
-export default function Index() {
+const Index: React.FC = () => {
+  const router = useRouter(); // Initialize the router
+
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Welcome to Viento</Text>
-      {/* Link to navigate to the login screen */}
-      <Link href="/login">
-        <Button title="Go to Login" />
-      </Link>
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome</Text>
+      <Button title="Go to Login" onPress={() => router.push("/login")} />
     </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+    backgroundColor: "#f5f5f5",
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+});
+
+export default Index;
